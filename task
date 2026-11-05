@@ -789,12 +789,13 @@ function Library:Draggable(TargetFrame, DragHandle, IgnoreLock)
 			NewX = (Tx + Ap.X * Ts.X - StartPosition.X.Scale * Ps.X) / S;
 			NewY = (Ty + Ap.Y * Ts.Y - StartPosition.Y.Scale * Ps.Y) / S;
 		end;
-		TargetFrame.Position = UDim2.new(
+		local Goal = UDim2.new(
 			StartPosition.X.Scale,
 			NewX,
 			StartPosition.Y.Scale,
 			NewY
 		);
+		TargetFrame.Position = TargetFrame.Position:Lerp(Goal, 0.38);
 	end;
 	self:Connection(Handle.InputBegan, function(Input)
 		if TargetFrame:GetAttribute("DraggingDisabled") then return end;
@@ -5488,6 +5489,8 @@ function Library:Window(Opts)
 	local MinWidth  = tonumber(Opts.MinWidth)  or 280;
 	local MinHeight = tonumber(Opts.MinHeight) or (IsMobilePlatform and 200 or 400);
 	Width, Height       = ClampWindowSize(Width, Height);
+	Width = math.floor(Width * 0.94);
+	Height = math.floor(Height * 0.94);
 	MinWidth, MinHeight = ClampWindowSize(MinWidth, MinHeight);
 	if Width  < MinWidth  then Width  = MinWidth  end;
 	if Height < MinHeight then Height = MinHeight end;
@@ -5500,10 +5503,74 @@ function Library:Window(Opts)
 	local Gui = self:CreateInstance("ScreenGui", {
 		Name = "XoneScriptKTallWindow";
 		Parent = (gethui and gethui()) or CoreGui;
+		DisplayOrder = 20;
 		IgnoreGuiInset = true;
 		ResetOnSpawn = false;
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
 	});
+	local Lighting = game:GetService("Lighting");
+	local SnowGui = self:CreateInstance("ScreenGui", {
+		Name = "StaticSnowEffect";
+		Parent = (gethui and gethui()) or CoreGui;
+		IgnoreGuiInset = true;
+		ResetOnSpawn = false;
+		DisplayOrder = 19;
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+	});
+	local SnowLayer = self:CreateInstance("Frame", {
+		Name = "SnowLayer";
+		Parent = SnowGui;
+		Size = UDim2.fromScale(1, 1);
+		BackgroundTransparency = 1;
+		BorderSizePixel = 0;
+		Active = false;
+	});
+	local Blur = Instance.new("BlurEffect");
+	Blur.Name = "StaticMenuBlur";
+	Blur.Size = 0;
+	Blur.Parent = Lighting;
+	local Snowflakes = {};
+	for I = 1, 24 do
+		local Flake = self:CreateInstance("Frame", {
+			Name = "Snowflake";
+			Parent = SnowLayer;
+			AnchorPoint = Vector2.new(0.5, 0.5);
+			Position = UDim2.fromScale(math.random(), math.random());
+			Size = UDim2.fromOffset(math.random(2, 4), math.random(2, 4));
+			BackgroundColor3 = Color3.fromRGB(235, 239, 255);
+			BackgroundTransparency = math.random(20, 55) / 100;
+			BorderSizePixel = 0;
+			Active = false;
+		});
+		self:CreateInstance("UICorner", { Parent = Flake; CornerRadius = UDim.new(1, 0) });
+		table.insert(Snowflakes, {
+			Object = Flake;
+			X = math.random();
+			Y = math.random();
+			Speed = math.random(7, 15) / 1000;
+			Drift = math.random(5, 18) / 10000;
+			Phase = math.random() * 6.28;
+		});
+	end;
+	local SnowConnection = RunService.RenderStepped:Connect(function()
+		if not SnowGui.Enabled then return end;
+		for _, Flake in ipairs(Snowflakes) do
+			Flake.Y += Flake.Speed;
+			Flake.X += math.sin(os.clock() + Flake.Phase) * Flake.Drift;
+			if Flake.Y > 1.03 then
+				Flake.Y = -0.03;
+				Flake.X = math.random();
+			end;
+			if Flake.X < -0.03 then Flake.X = 1.03 end;
+			if Flake.X > 1.03 then Flake.X = -0.03 end;
+			Flake.Object.Position = UDim2.fromScale(Flake.X, Flake.Y);
+		end;
+	end);
+	local function SetMenuEffects(Enabled)
+		SnowGui.Enabled = Enabled;
+		local Goal = Enabled and 14 or 0;
+		TweenService:Create(Blur, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = Goal }):Play();
+	end;
 	local Outer = self:CreateInstance("Frame", {
 		Name = "Outer";
 		Parent = Gui;
@@ -5550,7 +5617,7 @@ function Library:Window(Opts)
 		Rotation = 0;
 	});
 	Library:RegisterAccentGradient(TopLineGradient);
-	local TitleText = tostring(Opts.Title or Opts.Name or "XoneScriptK");
+	local TitleText = "static.gg";
 	local Title = self:CreateInstance("TextLabel", {
 		Name                   = "Title";
 		Parent                 = Outer;
@@ -5568,28 +5635,12 @@ function Library:Window(Opts)
 local TitleLogo = self:CreateInstance("ImageLabel", {
 	Name = "TitleLogo";
 	Parent = Outer;
-	AnchorPoint = Vector2.new(0, 0.5);
-	Position = UDim2.new(0, 12, 0, 20);
-	Size = UDim2.fromOffset(26,26);
+	Visible = false;
+	Size = UDim2.fromOffset(0, 0);
 	BackgroundTransparency = 1;
 });
-local LogoOpt = Opts.Logo;
-if LogoOpt == nil then LogoOpt = Opts.Icon end;
-if LogoOpt == nil then LogoOpt = Library._CustomLogo end;
-if LogoOpt == false then
-	TitleLogo.Visible = false;
-	Title.Position = UDim2.new(0, 12, 0, 12);
-else
-	local LogoAsset = Library._ResolveLogo and Library:_ResolveLogo(LogoOpt) or nil;
-	if LogoAsset then
-		TitleLogo.Image = LogoAsset;
-		table.insert(Library._LogoInstances or {}, TitleLogo);
-		Title.Position = UDim2.new(0, 5 + TitleLogo.AbsoluteSize.X + 4, 0, 9);
-	else
-		TitleLogo.Visible = false;
-		Title.Position = UDim2.new(0, 12, 0, 12);
-	end;
-end;
+Title.Position = UDim2.new(0, 12, 0, 12);
+
 	local Content = self:CreateInstance("Frame", {
 		Name             = "Content";
 		Parent           = Outer;
@@ -5631,6 +5682,7 @@ end;
 	local Window = { Gui = Gui, Outer = Outer, TopLine = TopLine, Content = Content };
 	Window._Tabs = {};
 	Window._SearchMatches = {};
+	SetMenuEffects(Opts.Visible ~= false);
 	local SearchRoot = Library:CreateInstance("Frame", {
 		Name                   = "SearchRoot";
 		Parent                 = Content;
@@ -6413,6 +6465,7 @@ RegisterGradLerp(GradEntry)
 		State = State and true or false;
 		if self.Visible == State and Gui.Enabled == State and not self._ActiveFade then return end;
 		self.Visible = State;
+		SetMenuEffects(State);
 		if self._ActiveFade then self._ActiveFade:Disconnect(); self._ActiveFade = nil end;
 		if Library._ReduceAnimations then
 			Library:_SnapFadeGroup(self._FadeOriginals, State and "in" or "out");
@@ -6459,6 +6512,9 @@ RegisterGradLerp(GradEntry)
 			end;
 		end;
 		Gui:Destroy();
+		if SnowConnection then SnowConnection:Disconnect() end;
+		if SnowGui then SnowGui:Destroy() end;
+		if Blur then Blur:Destroy() end;
 		if Library.CurrentlyOpen == self then Library.CurrentlyOpen = nil end;
 		if Library._SyncMobileMenuButton then Library:_SyncMobileMenuButton() end;
 	end;
