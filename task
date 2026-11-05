@@ -66,7 +66,7 @@ local Library = {
 	AnimationSpeed = 1;
 	LogFile = "XoneScriptK/Logs/Session.log";
 	DefaultLogo = "rbxassetid://136469174415866";
-    Version = "0.2c debug";
+    Version = "static.gg / R1 battle Royale";
 };
 Library._GradLerps = {}
 local Palette = {
