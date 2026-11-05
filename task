@@ -71,14 +71,14 @@ local Library = {
 Library._GradLerps = {}
 local Palette = {
 	Default = {
-		Top = Color3.fromHex("050505");
-		Bottom = Color3.fromHex("080808");
-		ContentTop = Color3.fromHex("050505");
-		ContentBottom = Color3.fromHex("080808");
-		FooterTop = Color3.fromHex("050505");
-		FooterBottom = Color3.fromHex("080808");
-		Outline = Color3.fromHex("000000");
-		InnerOutline = Color3.fromHex("202020");
+		Top = Color3.fromHex("161616");
+		Bottom = Color3.fromHex("1E1E1E");
+		ContentTop = Color3.fromHex("151515");
+		ContentBottom = Color3.fromHex("171717");
+		FooterTop = Color3.fromHex("151515");
+		FooterBottom = Color3.fromHex("1F1F1F");
+		Outline = Color3.fromHex("000105");
+		InnerOutline = Color3.fromHex("252527");
 		TitleTop = Color3.fromHex("F3F4F8");
 		TitleBottom = Color3.fromHex("808080");
 		TabActive = Color3.fromHex("808080");
@@ -1650,19 +1650,8 @@ local function BuildSection(Host, SecOpts)
 		Parent                 = Column;
 		Size                   = UDim2.new(1, 0, 0, 0);
 		AutomaticSize          = Enum.AutomaticSize.Y;
-		BackgroundColor3       = Color3.fromHex("080808");
-		BackgroundTransparency = 0;
+		BackgroundTransparency = 1;
 		BorderSizePixel        = 0;
-	});
-	Library:CreateInstance("UICorner", {
-		Parent = Sec;
-		CornerRadius = UDim.new(0, 7);
-	});
-	Library:CreateInstance("UIStroke", {
-		Parent = Sec;
-		Color = Color3.fromHex("202020");
-		Thickness = 1;
-		Transparency = 0.15;
 	});
 	local function Edge(Anchor, Pos, Sz, Color)
 		Library:CreateInstance("Frame", {
@@ -1670,7 +1659,7 @@ local function BuildSection(Host, SecOpts)
 			AnchorPoint      = Anchor;
 			Position         = Pos;
 			Size             = Sz;
-			BackgroundColor3 = Color3.fromHex("080808");
+			BackgroundColor3 = Color3.fromHex(Color);
 			BackgroundTransparency = 1;
 			BorderSizePixel  = 0;
 			ZIndex           = 5;
@@ -1684,6 +1673,7 @@ local function BuildSection(Host, SecOpts)
 		Position         = UDim2.new(0, 0, 0, 1);
 		Size             = UDim2.new(1, 0, 0, 1);
 		BackgroundColor3 = Color3.fromHex("FFFFFF");
+		BackgroundTransparency = 1;
 		BorderSizePixel  = 0;
 		ZIndex           = 5;
 	});
@@ -1704,6 +1694,7 @@ local function BuildSection(Host, SecOpts)
 		Position         = UDim2.new(0, 7, 0, 0);
 		Size             = UDim2.new(0, 0, 0, 2);
 		BackgroundColor3 = Color3.fromHex("161616");
+		BackgroundTransparency = 1;
 		BorderSizePixel  = 0;
 		ZIndex           = 6;
 	});
@@ -1725,7 +1716,7 @@ local function BuildSection(Host, SecOpts)
 		Name                   = "Title";
 		Parent                 = Sec;
 		AnchorPoint            = Vector2.new(0, 0.5);
-		Position               = UDim2.new(0, 11, 0, 2);
+		Position               = UDim2.new(0, 2, 0, 2);
 		AutomaticSize          = Enum.AutomaticSize.X;
 		Size                   = UDim2.new(0, 0, 0, 14);
 		BackgroundTransparency = 1;
@@ -1754,7 +1745,7 @@ local function BuildSection(Host, SecOpts)
 		Parent        = Body;
 		FillDirection = Enum.FillDirection.Vertical;
 		SortOrder     = Enum.SortOrder.LayoutOrder;
-		Padding       = UDim.new(0, 4);
+		Padding       = UDim.new(0, 6);
 	});
 	Library:CreateInstance("UIPadding", {
 		Parent        = Body;
@@ -1825,7 +1816,7 @@ local function BuildSection(Host, SecOpts)
 		local Strip = Library:CreateInstance("Frame", {
 			Name                   = "Tabs";
 			Parent                 = Box;
-			Size                   = UDim2.new(1, 0, 0, 24);
+			Size                   = UDim2.new(1, 0, 0, 30);
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 		});
@@ -2585,7 +2576,7 @@ local function BuildSection(Host, SecOpts)
 			});
 			local SatValArea = Library:CreateInstance("Frame", {
 				Parent           = ColorPage;
-				Position         = UDim2.new(0, 0, 0, 24);
+				Position         = UDim2.new(0, 0, 0, 36);
 				Size             = UDim2.new(1, -30, 1, -66);
 				BackgroundColor3 = Color3.fromRGB(255, 0, 0);
 				BorderSizePixel  = 0;
@@ -3644,8 +3635,8 @@ end;
 			ZIndex                 = 54;
 		});
 		local CpInactiveSeq = NewColorSequence({
-			NewColorSequenceKeypoint(0, Color3.fromHex("0C0C0C"));
-			NewColorSequenceKeypoint(1, Color3.fromHex("070707"));
+			NewColorSequenceKeypoint(0, Color3.fromHex("1F1F1F"));
+			NewColorSequenceKeypoint(1, Color3.fromHex("181818"));
 		});
 		local CpActiveSeq = NewColorSequence({
 			NewColorSequenceKeypoint(0, Color3.fromHex("161616"));
@@ -4075,7 +4066,7 @@ end;
 		local SatValArea = Library:CreateInstance("Frame", {
 			Name             = "SatVal";
 			Parent           = ColorPage;
-			Position         = UDim2.new(0, 0, 0, 24);
+			Position         = UDim2.new(0, 0, 0, 36);
 			Size             = UDim2.new(1, -30, 1, -66);
 			BackgroundColor3 = Color3.fromRGB(255, 0, 0);
 			BorderSizePixel  = 0;
@@ -5519,28 +5510,19 @@ function Library:Window(Opts)
 		AnchorPoint = Vector2.new(0.5, 0.5);
 		Position = UDim2.new(0.5, 0, 0.5, 0);
 		Size = UDim2.fromOffset(Width, Height);
-		BackgroundColor3 = Color3.fromHex("050505");
+		BackgroundColor3 = Color3.fromHex("08090D");
 		BorderSizePixel = 0;
 	});
-	self:CreateInstance("UICorner", {
-		Parent = Outer;
-		CornerRadius = UDim.new(0, 10);
-	});
+	self:CreateInstance("UICorner", { Parent = Outer; CornerRadius = UDim.new(0, 16) });
 	self:CreateInstance("UIGradient", {
 		Parent   = Outer;
 		Rotation = 90;
 		Color    = NewColorSequence({
-			NewColorSequenceKeypoint(0, Color3.fromHex("080808"));
-			NewColorSequenceKeypoint(1, Color3.fromHex("030303"));
+			NewColorSequenceKeypoint(0, Color3.fromHex("101116"));
+			NewColorSequenceKeypoint(1, Color3.fromHex("08090D"));
 		});
 	});
-	self:CreateInstance("UIStroke", {
-		Parent          = Outer;
-		Color           = Color3.fromHex("000000");
-		Thickness       = 1;
-		ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
-		LineJoinMode    = Enum.LineJoinMode.Miter;
-	});
+	
 	local InnerOutline = self:CreateInstance("Frame", {
 		Name = "InnerOutline";
 		Parent = Outer;
@@ -5549,26 +5531,17 @@ function Library:Window(Opts)
 		BackgroundTransparency = 1;
 		BorderSizePixel = 0;
 	});
-	self:CreateInstance("UICorner", {
-		Parent = InnerOutline;
-		CornerRadius = UDim.new(0, 9);
-	});
-	pcall(function() Library:AddGlowingV2(Outer, Color3.fromHex("000000"), 0.55) end);
-	pcall(function() Library:AddGlowingV2(Outer, Library.Accent, 0.86) end);
+	self:CreateInstance("UICorner", { Parent = InnerOutline; CornerRadius = UDim.new(0, 15) });
+	pcall(function() Library:AddGlowingV2(Outer, Color3.fromHex("000000"), 0.7) end);
 	local AnimScale = self:CreateInstance("UIScale", { Parent = Outer; Scale = 1 });
-	self:CreateInstance("UIStroke", {
-		Parent          = InnerOutline;
-		Color           = Color3.fromHex("393939");
-		Thickness       = 1;
-		ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
-		LineJoinMode    = Enum.LineJoinMode.Miter;
-	});
+	
 	local TopLine = self:CreateInstance("Frame", {
 		Name = "TopLine";
 		Parent = Outer;
 		Position = UDim2.new(0, 1, 0, 1);
 		Size = UDim2.new(1, -2, 0, 1);
 		BackgroundColor3 = Color3.fromHex("FFFFFF");
+		BackgroundTransparency = 1;
 		BorderSizePixel = 0;
 		ZIndex = 10;
 	});
@@ -5581,7 +5554,7 @@ function Library:Window(Opts)
 	local Title = self:CreateInstance("TextLabel", {
 		Name                   = "Title";
 		Parent                 = Outer;
-		Position               = UDim2.new(0, 6, 0, 9);
+		Position               = UDim2.new(0, 12, 0, 12);
 		Size                   = UDim2.new(0, 200, 0, 18);
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0;
@@ -5596,7 +5569,7 @@ local TitleLogo = self:CreateInstance("ImageLabel", {
 	Name = "TitleLogo";
 	Parent = Outer;
 	AnchorPoint = Vector2.new(0, 0.5);
-	Position = UDim2.new(0, 5, 0, 20);
+	Position = UDim2.new(0, 12, 0, 20);
 	Size = UDim2.fromOffset(26,26);
 	BackgroundTransparency = 1;
 });
@@ -5605,7 +5578,7 @@ if LogoOpt == nil then LogoOpt = Opts.Icon end;
 if LogoOpt == nil then LogoOpt = Library._CustomLogo end;
 if LogoOpt == false then
 	TitleLogo.Visible = false;
-	Title.Position = UDim2.new(0, 6, 0, 9);
+	Title.Position = UDim2.new(0, 12, 0, 12);
 else
 	local LogoAsset = Library._ResolveLogo and Library:_ResolveLogo(LogoOpt) or nil;
 	if LogoAsset then
@@ -5614,28 +5587,24 @@ else
 		Title.Position = UDim2.new(0, 5 + TitleLogo.AbsoluteSize.X + 4, 0, 9);
 	else
 		TitleLogo.Visible = false;
-		Title.Position = UDim2.new(0, 6, 0, 9);
+		Title.Position = UDim2.new(0, 12, 0, 12);
 	end;
 end;
 	local Content = self:CreateInstance("Frame", {
 		Name             = "Content";
 		Parent           = Outer;
-		Position         = UDim2.new(0, 5, 0, 34);
-		Size             = UDim2.new(1, -10, 1, -39);
-		BackgroundColor3 = Color3.fromHex("050505");
+		Position         = UDim2.new(0, 10, 0, 40);
+		Size             = UDim2.new(1, -20, 1, -50);
+		BackgroundColor3 = Color3.fromHex("0B0C11");
 		BorderSizePixel  = 0;
-		ClipsDescendants = true;
 	});
-	self:CreateInstance("UICorner", {
-		Parent = Content;
-		CornerRadius = UDim.new(0, 8);
-	});
+	self:CreateInstance("UICorner", { Parent = Content; CornerRadius = UDim.new(0, 12) });
 	self:CreateInstance("UIGradient", {
 		Parent   = Content;
 		Rotation = 90;
 		Color    = NewColorSequence({
-			NewColorSequenceKeypoint(0, Color3.fromHex("080808"));
-			NewColorSequenceKeypoint(1, Color3.fromHex("040404"));
+			NewColorSequenceKeypoint(0, Color3.fromHex("0D0E13"));
+			NewColorSequenceKeypoint(1, Color3.fromHex("0A0B10"));
 		});
 	});
 	local function ContentEdge(Name, Anchor, Pos, Sz, Color)
@@ -5646,6 +5615,7 @@ end;
 			Position         = Pos;
 			Size             = Sz;
 			BackgroundColor3 = Color3.fromHex(Color);
+			BackgroundTransparency = 1;
 			BorderSizePixel  = 0;
 			ZIndex           = 10;
 		});
@@ -5984,7 +5954,7 @@ end;
 		for _, T in Win._Tabs do
 			T.Button.Size = Sidebar and UDim2.new(1, 0, 0, 24) or UDim2.new(1 / N, 0, 1, 0);
 			if T.Separator then T.Separator.Visible = not Sidebar end;
-			T._PageHome = Sidebar and UDim2.new(0, 116, 0, 0) or UDim2.new(0, 0, 0, 24);
+			T._PageHome = Sidebar and UDim2.new(0, 116, 0, 0) or UDim2.new(0, 0, 0, 36);
 			local PageSize = Sidebar and UDim2.new(1, -116, 1, -Reserve) or UDim2.new(1, 0, 1, -24 - Reserve);
 			Library:Tween(T.Page, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 				Position = T._PageHome;
@@ -6008,7 +5978,7 @@ end;
 				Name                   = "TabBar";
 				Parent                 = self.Content;
 				Position               = UDim2.new(0, 0, 0, 0);
-				Size                   = UDim2.new(1, 0, 0, 24);
+				Size                   = UDim2.new(1, 0, 0, 30);
 				BackgroundTransparency = 1;
 				BorderSizePixel        = 0;
 				ZIndex                 = 5;
@@ -6017,7 +5987,7 @@ end;
 				Parent        = self.TabBar;
 				FillDirection = Enum.FillDirection.Horizontal;
 				SortOrder     = Enum.SortOrder.LayoutOrder;
-				Padding       = UDim.new(0, 0);
+				Padding       = UDim.new(0, 5);
 			});
 		end;
 		local Btn = Library:CreateInstance("TextButton", {
@@ -6033,15 +6003,13 @@ end;
 		local Bg = Library:CreateInstance("Frame", {
 			Name             = "Bg";
 			Parent           = Btn;
-			Position         = UDim2.new(0, 2, 0, 2);
-			Size             = UDim2.new(1, -4, 1, -4);
-			BackgroundColor3 = Color3.fromHex("080808");
+			Position         = UDim2.new(0, 0, 0, 0);
+			Size             = UDim2.new(1, 0, 1, 0);
+			BackgroundColor3 = Color3.fromHex("151720");
+			BackgroundTransparency = 0;
 			BorderSizePixel  = 0;
 		});
-		Library:CreateInstance("UICorner", {
-			Parent = Bg;
-			CornerRadius = UDim.new(0, 6);
-		});
+		Library:CreateInstance("UICorner", { Parent = Bg; CornerRadius = UDim.new(0, 8) });
 		local Gradient = Library:CreateInstance("UIGradient", {
 			Parent   = Bg;
 			Rotation = 90;
@@ -6114,8 +6082,8 @@ end;
 		local Page = Library:CreateInstance("CanvasGroup", {
 			Name                   = "Page_" .. TabName;
 			Parent                 = self.Content;
-			Position               = UDim2.new(0, 0, 0, 24);
-			Size                   = UDim2.new(1, 0, 1, -24);
+			Position               = UDim2.new(0, 0, 0, 36);
+			Size                   = UDim2.new(1, 0, 1, -36);
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 			Visible                = false;
@@ -6135,7 +6103,7 @@ end;
 			Parent        = Page;
 			PaddingLeft   = UDim.new(0, 6);
 			PaddingRight  = UDim.new(0, 6);
-			PaddingTop    = UDim.new(0, 11);
+			PaddingTop    = UDim.new(0, 8);
 			PaddingBottom = UDim.new(0, 6);
 		});
 		local LeftColumn = Library:CreateInstance("ScrollingFrame", {
@@ -6231,8 +6199,8 @@ end;
 		};
 		local PageInfo = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
 		local BgInfo   = TweenInfo.new(0.2,  Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
-		local InactiveA, InactiveB = Color3.fromHex("0C0C0C"), Color3.fromHex("070707");
-		local ActiveA,   ActiveB   = Color3.fromHex("202020"), Color3.fromHex("141414");
+		local InactiveA, InactiveB = Color3.fromHex("0B0C11"), Color3.fromHex("0B0C11");
+		local ActiveA,   ActiveB   = Color3.fromHex("242631"), Color3.fromHex("1A1C25");
 		local GradT      = TabRef.Active and 1 or 0;
 		local GradTarget = GradT;
 		local function ApplyGrad()
@@ -6285,7 +6253,7 @@ RegisterGradLerp(GradEntry)
 				self.Page.Visible = true;
 				Library:Tween(self.Page, PageInfo, { GroupTransparency = 0 }):Play();
 				if WasHidden then
-					local Home = self._PageHome or UDim2.new(0, 0, 0, 24);
+					local Home = self._PageHome or UDim2.new(0, 0, 0, 36);
 					self.Page.Position = Home + UDim2.fromOffset(0, 8);
 					Library:Tween(self.Page, PageInfo, { Position = Home }):Play();
 				end;
@@ -6303,7 +6271,7 @@ RegisterGradLerp(GradEntry)
 			else
 				local P = self.Page;
 				Library:Tween(P, PageInfo, { GroupTransparency = 1 }):Play();
-				local Home = self._PageHome or UDim2.new(0, 0, 0, 24);
+				local Home = self._PageHome or UDim2.new(0, 0, 0, 36);
 				Library:Tween(P, PageInfo, { Position = Home + UDim2.fromOffset(0, 8) }):Play();
 				task.delay(PageInfo.Time, function()
 					if not self.Active then P.Visible = false; P.Position = Home end;
@@ -6314,7 +6282,7 @@ RegisterGradLerp(GradEntry)
 				}):Play();
 				GradTarget          = 0;
 				Bg.BackgroundColor3 = Color3.fromHex("FFFFFF");
-				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("8C8F99") }):Play();
+				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("A5A8B4") }):Play();
 			end;
 		end;
 		function TabRef:Section(SecOpts)
