@@ -66,7 +66,7 @@ local Library = {
 	AnimationSpeed = 1;
 	LogFile = "XoneScriptK/Logs/Session.log";
 	DefaultLogo = "rbxassetid://136469174415866";
-    Version = "static.gg / R1 battle Royale";
+    Version = "0.2c debug";
 };
 Library._GradLerps = {}
 local Palette = {
@@ -560,6 +560,10 @@ function Library:CreateInstance(ClassName, Properties)
 	for K, V in (Properties or {}) do
 		Inst[K] = V;
 	end;
+	if (ClassName == "TextLabel" or ClassName == "TextButton" or ClassName == "TextBox") and not (Properties and (Properties.Font or Properties.FontFace)) then
+		Inst.Font = Enum.Font.Gotham;
+		Inst.TextScaled = false;
+	end;
 	return Inst;
 end;
 function Library:Tween(Inst, Info, Props)
@@ -747,7 +751,7 @@ function Library:Draggable(TargetFrame, DragHandle, IgnoreLock)
 	local Dragging = false;
 	local DragStart, StartPosition;
 	local LastInput = nil;
-	local Dirty     = false;
+	local DragInputType = nil;
 	local ShadowCache = nil;
 	local function SetShadows(Enabled)
 		if not ShadowCache then
@@ -795,7 +799,7 @@ function Library:Draggable(TargetFrame, DragHandle, IgnoreLock)
 			StartPosition.Y.Scale,
 			NewY
 		);
-		TargetFrame.Position = TargetFrame.Position:Lerp(Goal, 0.38);
+		TargetFrame.Position = Goal;
 	end;
 	self:Connection(Handle.InputBegan, function(Input)
 		if TargetFrame:GetAttribute("DraggingDisabled") then return end;
@@ -810,6 +814,7 @@ function Library:Draggable(TargetFrame, DragHandle, IgnoreLock)
 		Dragging           = true;
 		Library.IsDragging = true;
 		DragStart          = Input.Position;
+		DragInputType      = Input.UserInputType;
 		StartPosition      = TargetFrame.Position;
 		SetShadows(false);
 	end);
@@ -821,7 +826,7 @@ function Library:Draggable(TargetFrame, DragHandle, IgnoreLock)
 			SetShadows(true);
 			Dragging           = false;
 			Library.IsDragging = false;
-			LastInput, Dirty   = nil, false;
+			LastInput, DragInputType = nil, nil;
 		end;
 	end);
 	self:Connection(UserInputService.InputChanged, function(Input)
@@ -833,23 +838,26 @@ function Library:Draggable(TargetFrame, DragHandle, IgnoreLock)
 		end;
 		if not Dragging then return end;
 		LastInput = Input;
-		Dirty     = true;
 	end);
 	self:Connection(RunService.RenderStepped, function()
 		if TargetFrame:GetAttribute("DraggingDisabled") then
 			if Dragging then Dragging = false; Library.IsDragging = false; SetShadows(true) end;
 			return;
 		end;
-		if not Dragging or not Dirty or not LastInput then return end;
+		if not Dragging then return end;
 		if not IgnoreLock and Library.CanDrag == false then
 			SetShadows(true);
 			Dragging           = false;
 			Library.IsDragging = false;
-			LastInput, Dirty   = nil, false;
+			LastInput, DragInputType = nil, nil;
 			return;
 		end;
-		Dirty = false;
-		Set(LastInput);
+		if DragInputType == Enum.UserInputType.MouseButton1 then
+			local MousePosition = UserInputService:GetMouseLocation();
+			Set({ Position = Vector3.new(MousePosition.X, MousePosition.Y, 0) });
+		elseif LastInput then
+			Set(LastInput);
+		end;
 	end);
 end;
 function Library:BindLongPress(Button, Callback, HoldTime)
@@ -1460,16 +1468,8 @@ function Library:AddGlowingV2(frame,color,transparency)
 		end;
 	end);
 end
-local ProggyCleanFont;
-do
-	local Asset = Library:RegisterFont("ProggyClean", "https://github.com/networph-private874612748471/curly-octo-memory/raw/refs/heads/main/fs-tahoma-8px.ttf", 400, "normal");
-	if Asset then
-		ProggyCleanFont = Font.new(Asset, Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-	else
-		print("font no work lmfao");
-	end;
-end;
-getgenv().proggyfont = ProggyCleanFont
+local ProggyCleanFont = nil;
+getgenv().proggyfont = nil;
 function Library:Tooltip(Inst, Text)
 	if not Inst or not Text or Text == "" then return end;
 	Inst:SetAttribute("SearchTooltip", tostring(Text));
@@ -1951,6 +1951,7 @@ local function BuildSection(Host, SecOpts)
 			Name                   = "Toggle_" .. Name;
 			Parent                 = self.Body;
 			Size                   = UDim2.new(1, 0, 0, 16);
+			AutomaticSize          = Enum.AutomaticSize.Y;
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 			AutoButtonColor        = false;
@@ -1962,25 +1963,28 @@ local function BuildSection(Host, SecOpts)
 			AnchorPoint      = Vector2.new(0, 0.5);
 			Position         = UDim2.new(0, 0, 0.5, 0);
 			Size             = UDim2.fromOffset(14, 14);
-			BackgroundColor3 = Color3.fromHex("000000");
+			BackgroundColor3 = Color3.fromHex("15161B");
 			BorderSizePixel  = 0;
 		});
+		Library:CreateInstance("UICorner", { Parent = Box; CornerRadius = UDim.new(0, 4) });
 		local BoxGray = Library:CreateInstance("Frame", {
 			Name             = "Gray";
 			Parent           = Box;
 			Position         = UDim2.new(0, 1, 0, 1);
 			Size             = UDim2.new(1, -2, 1, -2);
-			BackgroundColor3 = Color3.fromHex("393939");
+			BackgroundColor3 = Color3.fromHex("30323A");
 			BorderSizePixel  = 0;
 		});
+		Library:CreateInstance("UICorner", { Parent = BoxGray; CornerRadius = UDim.new(0, 3) });
 		local BoxInside = Library:CreateInstance("Frame", {
 			Name             = "Inside";
 			Parent           = BoxGray;
 			Position         = UDim2.new(0, 1, 0, 1);
 			Size             = UDim2.new(1, -2, 1, -2);
-			BackgroundColor3 = Color3.fromHex("131313");
+			BackgroundColor3 = Color3.fromHex("111216");
 			BorderSizePixel  = 0;
 		});
+		Library:CreateInstance("UICorner", { Parent = BoxInside; CornerRadius = UDim.new(0, 2) });
 		local Fill = Library:CreateInstance("Frame", {
 			Name                   = "Fill";
 			Parent                 = BoxInside;
@@ -1992,12 +1996,26 @@ local function BuildSection(Host, SecOpts)
 			BorderSizePixel        = 0;
 		});
 		Library:RegisterAccent(Fill);
+		local Check = Library:CreateInstance("TextLabel", {
+			Name = "Check";
+			Parent = Box;
+			Size = UDim2.fromScale(1, 1);
+			BackgroundTransparency = 1;
+			Text = "✓";
+			TextColor3 = Color3.fromHex("FFFFFF");
+			TextSize = 11;
+			TextScaled = false;
+			Visible = State;
+			ZIndex = 10;
+		});
 		local Lbl = Library:CreateInstance("TextLabel", {
 			Name                   = "Label";
 			Parent                 = Row;
-			AnchorPoint            = Vector2.new(0, 0.5);
-			Position               = UDim2.new(0, 20, 0.5, 0);
-			Size                   = UDim2.new(1, -20, 1, 0);
+			AnchorPoint            = Vector2.new(0, 0);
+			Position               = UDim2.new(0, 20, 0, 0);
+			Size                   = UDim2.new(1, -20, 0, 16);
+			AutomaticSize          = Enum.AutomaticSize.Y;
+			TextWrapped            = true;
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 			Text                   = Name;
@@ -2010,6 +2028,7 @@ local function BuildSection(Host, SecOpts)
 		local TweenIn  = TweenInfo.new(0.16, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out);
 		local TweenOut = TweenInfo.new(0.14, Enum.EasingStyle.Quad,  Enum.EasingDirection.In);
 		local function Render()
+			Check.Visible = State;
 			local Info = State and TweenIn or TweenOut;
 			Library:Tween(Fill, Info, {
 				Size                   = State and UDim2.new(1, -2, 1, -2) or UDim2.new(0, 0, 0, 0);
@@ -2415,8 +2434,8 @@ local function BuildSection(Host, SecOpts)
 				BorderSizePixel        = 0;
 			});
 			local CpInactiveSeq = NewColorSequence({
-				NewColorSequenceKeypoint(0, Color3.fromHex("1F1F1F"));
-				NewColorSequenceKeypoint(1, Color3.fromHex("181818"));
+				NewColorSequenceKeypoint(0, Color3.fromHex("15161B"));
+				NewColorSequenceKeypoint(1, Color3.fromHex("101116"));
 			});
 			local CpActiveSeq = NewColorSequence({
 				NewColorSequenceKeypoint(0, Color3.fromHex("161616"));
@@ -3356,7 +3375,7 @@ end;
 		local Row = Library:CreateInstance("Frame", {
 			Name                   = "ButtonRow_" .. Name;
 			Parent                 = self.Body;
-			Size                   = UDim2.new(1, 0, 0, 21);
+			Size                   = UDim2.new(1, 0, 0, 25);
 			BackgroundTransparency = 1;
 			BorderSizePixel        = 0;
 		});
@@ -3379,7 +3398,7 @@ end;
 			local Btn = Library:CreateInstance("TextButton", {
 				Name                   = "Btn_" .. BtnName;
 				Parent                 = Row;
-				BackgroundColor3       = Color3.fromHex("000000");
+				BackgroundColor3       = Color3.fromHex("111216");
 				BorderSizePixel        = 0;
 				AutoButtonColor        = false;
 				Text                   = "";
@@ -3387,16 +3406,17 @@ end;
 			});
 			local BGray = Library:CreateInstance("Frame", {
 				Parent           = Btn;
-				Position         = UDim2.new(0, 1, 0, 1);
-				Size             = UDim2.new(1, -2, 1, -2);
-				BackgroundColor3 = Color3.fromHex("393939");
+				Position         = UDim2.new(0, 0, 0, 0);
+				Size             = UDim2.new(1, 0, 1, 0);
+				BackgroundColor3 = Color3.fromHex("202127");
 				BorderSizePixel  = 0;
 			});
+			Library:CreateInstance("UICorner", { Parent = BGray; CornerRadius = UDim.new(0, 6) });
 			local BInside = Library:CreateInstance("Frame", {
 				Parent           = BGray;
 				Position         = UDim2.new(0, 1, 0, 1);
 				Size             = UDim2.new(1, -2, 1, -2);
-				BackgroundColor3 = Color3.fromHex("FFFFFF");
+				BackgroundColor3 = Color3.fromHex("111216");
 				BorderSizePixel  = 0;
 			});
 			Library:CreateInstance("UIGradient", {
@@ -3414,12 +3434,15 @@ end;
 				BackgroundTransparency = 1;
 				BorderSizePixel        = 0;
 				Text                   = BtnName;
-				TextColor3             = Color3.fromHex("FFFFFF");
-				TextSize               = 12;
+				TextColor3             = Color3.fromHex("E6E7EB");
+				TextSize               = 11;
+				TextWrapped            = true;
+				TextScaled             = false;
 				TextXAlignment         = Enum.TextXAlignment.Center;
 				TextYAlignment         = Enum.TextYAlignment.Center;
 			});
 			if ProggyCleanFont then Lbl.FontFace = ProggyCleanFont end;
+			Library:CreateInstance("UICorner", { Parent = BInside; CornerRadius = UDim.new(0, 5) });
 			local ClickIn  = TweenInfo.new(0.1,  Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 			local ClickOut = TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 			local function FlashBg()
@@ -5501,7 +5524,7 @@ function Library:Window(Opts)
 		Height = math.clamp(math.floor(Vp.Y) - 35, 200, 600);
 	end;
 	local Gui = self:CreateInstance("ScreenGui", {
-		Name = "XoneScriptKTallWindow";
+		Name = "static.gg";
 		Parent = (gethui and gethui()) or CoreGui;
 		DisplayOrder = 20;
 		IgnoreGuiInset = true;
@@ -5530,15 +5553,15 @@ function Library:Window(Opts)
 	Blur.Size = 0;
 	Blur.Parent = Lighting;
 	local Snowflakes = {};
-	for I = 1, 24 do
+	for I = 1, 42 do
 		local Flake = self:CreateInstance("Frame", {
 			Name = "Snowflake";
 			Parent = SnowLayer;
 			AnchorPoint = Vector2.new(0.5, 0.5);
 			Position = UDim2.fromScale(math.random(), math.random());
-			Size = UDim2.fromOffset(math.random(2, 4), math.random(2, 4));
+			Size = UDim2.fromOffset(math.random(3, 5), math.random(3, 5));
 			BackgroundColor3 = Color3.fromRGB(235, 239, 255);
-			BackgroundTransparency = math.random(20, 55) / 100;
+			BackgroundTransparency = math.random(12, 42) / 100;
 			BorderSizePixel = 0;
 			Active = false;
 		});
@@ -5547,8 +5570,8 @@ function Library:Window(Opts)
 			Object = Flake;
 			X = math.random();
 			Y = math.random();
-			Speed = math.random(7, 15) / 1000;
-			Drift = math.random(5, 18) / 10000;
+			Speed = math.random(6, 13) / 1000;
+			Drift = math.random(5, 16) / 10000;
 			Phase = math.random() * 6.28;
 		});
 	end;
@@ -5621,25 +5644,19 @@ function Library:Window(Opts)
 	local Title = self:CreateInstance("TextLabel", {
 		Name                   = "Title";
 		Parent                 = Outer;
-		Position               = UDim2.new(0, 12, 0, 12);
-		Size                   = UDim2.new(0, 200, 0, 18);
+		Position               = UDim2.new(0, 14, 0, 8);
+		Size                   = UDim2.new(0, 260, 0, 26);
 		BackgroundTransparency = 1;
 		BorderSizePixel        = 0;
 		Text                   = TitleText;
 		TextColor3             = Color3.fromHex("FFFFFF");
-		TextSize               = 12;
+		TextSize               = 17;
 		TextXAlignment         = Enum.TextXAlignment.Left;
 		TextYAlignment         = Enum.TextYAlignment.Center;
+		TextScaled             = false;
 	});
 	if ProggyCleanFont then Title.FontFace = ProggyCleanFont end;
-local TitleLogo = self:CreateInstance("ImageLabel", {
-	Name = "TitleLogo";
-	Parent = Outer;
-	Visible = false;
-	Size = UDim2.fromOffset(0, 0);
-	BackgroundTransparency = 1;
-});
-Title.Position = UDim2.new(0, 12, 0, 12);
+Title.Position = UDim2.new(0, 14, 0, 8);
 
 	local Content = self:CreateInstance("Frame", {
 		Name             = "Content";
@@ -6039,7 +6056,7 @@ Title.Position = UDim2.new(0, 12, 0, 12);
 				Parent        = self.TabBar;
 				FillDirection = Enum.FillDirection.Horizontal;
 				SortOrder     = Enum.SortOrder.LayoutOrder;
-				Padding       = UDim.new(0, 5);
+				Padding       = UDim.new(0, 4);
 			});
 		end;
 		local Btn = Library:CreateInstance("TextButton", {
@@ -6057,7 +6074,7 @@ Title.Position = UDim2.new(0, 12, 0, 12);
 			Parent           = Btn;
 			Position         = UDim2.new(0, 0, 0, 0);
 			Size             = UDim2.new(1, 0, 1, 0);
-			BackgroundColor3 = Color3.fromHex("151720");
+			BackgroundColor3 = Color3.fromHex("101116");
 			BackgroundTransparency = 0;
 			BorderSizePixel  = 0;
 		});
@@ -6066,8 +6083,8 @@ Title.Position = UDim2.new(0, 12, 0, 12);
 			Parent   = Bg;
 			Rotation = 90;
 			Color    = NewColorSequence({
-				NewColorSequenceKeypoint(0, Color3.fromHex("1F1F1F"));
-				NewColorSequenceKeypoint(1, Color3.fromHex("181818"));
+				NewColorSequenceKeypoint(0, Color3.fromHex("15161B"));
+				NewColorSequenceKeypoint(1, Color3.fromHex("101116"));
 			});
 		});
 		local function MakePiece(Name, Anchor, Pos, Sz, Color, ZIdx)
@@ -6110,7 +6127,8 @@ Title.Position = UDim2.new(0, 12, 0, 12);
 			BorderSizePixel        = 0;
 			Text                   = TabName;
 			TextSize               = 12;
-			TextColor3             = Color3.fromHex("8C8F99");
+			TextScaled             = false;
+			TextColor3             = Color3.fromHex("777B86");
 			TextXAlignment         = Enum.TextXAlignment.Center;
 			TextYAlignment         = Enum.TextYAlignment.Center;
 		});
@@ -6251,8 +6269,8 @@ Title.Position = UDim2.new(0, 12, 0, 12);
 		};
 		local PageInfo = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
 		local BgInfo   = TweenInfo.new(0.2,  Enum.EasingStyle.Quint, Enum.EasingDirection.Out);
-		local InactiveA, InactiveB = Color3.fromHex("0B0C11"), Color3.fromHex("0B0C11");
-		local ActiveA,   ActiveB   = Color3.fromHex("242631"), Color3.fromHex("1A1C25");
+		local InactiveA, InactiveB = Color3.fromHex("101116"), Color3.fromHex("101116");
+		local ActiveA,   ActiveB   = Color3.fromHex("202127"), Color3.fromHex("17181E");
 		local GradT      = TabRef.Active and 1 or 0;
 		local GradTarget = GradT;
 		local function ApplyGrad()
@@ -6316,7 +6334,7 @@ RegisterGradLerp(GradEntry)
 					Size     = UDim2.new(1, -Lo - Ro, 1, -1);
 				}):Play();
 				GradTarget          = 1;
-				Bg.BackgroundColor3 = Color3.fromHex("FFFFFF");
+				Bg.BackgroundColor3 = Color3.fromHex("17181E");
 				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("FFFFFF") }):Play();
 				TopGradient.Position = UDim2.new(0, 0, 0, 0);
 				TopGradient.Size     = UDim2.new(1, 0, 0, 1);
@@ -6333,8 +6351,8 @@ RegisterGradLerp(GradEntry)
 					Size     = UDim2.new(1, 0, 1, 0);
 				}):Play();
 				GradTarget          = 0;
-				Bg.BackgroundColor3 = Color3.fromHex("FFFFFF");
-				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("A5A8B4") }):Play();
+				Bg.BackgroundColor3 = Color3.fromHex("17181E");
+				Library:Tween(Lbl, BgInfo, { TextColor3 = Color3.fromHex("777B86") }):Play();
 			end;
 		end;
 		function TabRef:Section(SecOpts)
